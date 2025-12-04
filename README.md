@@ -1,30 +1,159 @@
-# Scientific Calculator (Hacker Mode) 🌍
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Scientific Calculator</title>
+    <style>
+        :root{--bg:#050505;--panel:rgba(20,20,25,0.95);--p:#8b5cf6;--s:#06b6d4;--g:#00ff41;--t:#e2e8f0;--d:#94a3b8;}
+        *{margin:0;padding:0;box-sizing:border-box;outline:0;-webkit-tap-highlight-color:transparent}
+        body{background:var(--bg);color:var(--t);font-family:sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none}
+        .bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;display:flex;justify-content:center;align-items:center;pointer-events:none}
+        .globe{font-size:50vh;filter:blur(5px) grayscale(30%);animation:rot 60s linear infinite;opacity:0.1}
+        @keyframes rot{to{transform:rotate(360deg)}}
+        header{text-align:center;padding:15px;background:#000;border-bottom:1px solid #333;z-index:10}
+        .title{background:linear-gradient(to right,var(--s),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;letter-spacing:1px}
+        nav{display:flex;justify-content:space-around;padding:10px;background:rgba(10,10,10,0.9);border-bottom:1px solid #333;z-index:10}
+        .btn{background:0;border:0;color:var(--d);font-weight:600;padding:5px;cursor:pointer}
+        .btn.active{color:var(--s);border-bottom:2px solid var(--s)}
+        main{flex:1;overflow-y:auto;padding:15px;position:relative}
+        .sec{display:none;animation:fade 0.3s forwards;padding-bottom:50px}
+        .sec.active{display:block}
+        @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* Calculator */
+        .disp-box{position:sticky;top:0;background:#000;z-index:50;padding:15px;text-align:right;border-bottom:1px solid #333;margin-bottom:15px}
+        .scr{font-size:2.5rem;color:#fff;word-wrap:break-word}
+        .hist{font-size:0.9rem;color:var(--d);min-height:1.2rem}
+        .pad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+        .k{background:var(--panel);color:var(--t);padding:15px 0;border-radius:8px;text-align:center;font-size:1.1rem;cursor:pointer;border:1px solid #333}
+        .k:active{background:#222}
+        .k.eq{background:var(--p);color:#fff}
+        .k.sci{font-size:0.8rem;color:var(--d);background:#111}
 
-A next-generation, cyberpunk-themed Scientific and Loan Calculator. Built with HTML5, CSS3, and JavaScript.
+        /* Loan */
+        .inp-grp{margin-bottom:15px}
+        .inp-grp label{display:block;color:var(--d);margin-bottom:5px;font-size:0.9rem}
+        .inp-grp input,select{width:100%;background:#111;border:1px solid #333;color:#fff;padding:12px;border-radius:5px}
+        .calc-btn{width:100%;padding:15px;background:var(--s);border:0;border-radius:5px;font-weight:bold;color:#000;margin-top:10px}
+        .res-box{margin-top:20px;padding:20px;background:#111;border-radius:10px;text-align:center}
+        .chart{width:120px;height:120px;border-radius:50%;background:conic-gradient(var(--p) 0deg, #222 0deg);margin:0 auto 15px;display:flex;align-items:center;justify-content:center}
+        .chart span{font-size:1.2rem;font-weight:bold;color:#fff}
+        
+        /* Modal */
+        .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:999;display:none;align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .box{background:#000;border:1px solid var(--g);padding:25px;width:85%;max-width:350px;color:var(--g);font-family:monospace}
+        .box input{width:100%;background:#111;border:1px solid #333;color:#fff;padding:10px;margin:10px 0}
+        .enter{width:100%;background:var(--g);border:0;padding:10px;font-weight:bold;cursor:pointer}
+    </style>
+</head>
+<body>
+    <div class="bg"><div class="globe">🌍</div></div>
 
-**Live Demo:** [Click Here to View](https://yourusername.github.io/repository-name)  
-*(Replace with your actual GitHub Pages link after following steps below)*
+    <div id="modal" class="modal"><div class="box">
+        <h3>SYSTEM ACCESS</h3><p>Identify yourself.</p>
+        <input id="name" placeholder="Codename..."><button class="enter" onclick="login()">INITIALIZE</button>
+    </div></div>
 
-## ✨ Features
-1.  **Hacker UI:** Neon glowing effects, glassmorphism, and a rotating globe background with electric shockwaves.
-2.  **Scientific Functions:** Trigonometry (sin, cos, tan), Logarithms, Exponents, Factorials, and Memory functions.
-3.  **Loan Calculator (INR):** Calculates EMI for Reducing and Flat rates with Indian Rupee formatting (Lakhs/Crores).
-4.  **History Log:** Keeps track of calculations in a terminal-style log.
-5.  **User System:** Onboarding pop-up that remembers the user's codename.
-6.  **Responsive:** Works perfectly on Mobile (sticky keypad) and Desktop.
+    <header><div class="title">SCIENTIFIC CALCULATOR</div></header>
+    <nav>
+        <button class="btn active" onclick="tab('calc')">Calc</button>
+        <button class="btn" onclick="tab('loan')">Loan</button>
+        <button class="btn" onclick="tab('contact')">Contact</button>
+    </nav>
 
-## 🚀 How to Publish on GitHub
-1.  Create a repository named `scientific-calculator`.
-2.  Upload `index.html`.
-3.  Go to **Settings** > **Pages**.
-4.  Under "Branch", select **main** and click **Save**.
-5.  Wait 1 minute, then refresh to see your live link!
+    <main>
+        <!-- Calculator -->
+        <section id="calc" class="sec active">
+            <div class="disp-box">
+                <div class="hist" id="hist"></div>
+                <div class="scr" id="scr">0</div>
+            </div>
+            <div class="pad">
+                <div class="k sci" onclick="clr()">AC</div><div class="k sci" onclick="del()">⌫</div>
+                <div class="k sci" onclick="fn('sin')">sin</div><div class="k sci" onclick="fn('cos')">cos</div><div class="k sci" onclick="fn('tan')">tan</div>
+                <div class="k" onclick="num('7')">7</div><div class="k" onclick="num('8')">8</div><div class="k" onclick="num('9')">9</div><div class="k sci" onclick="op('/')">÷</div><div class="k sci" onclick="op('^')">^</div>
+                <div class="k" onclick="num('4')">4</div><div class="k" onclick="num('5')">5</div><div class="k" onclick="num('6')">6</div><div class="k sci" onclick="op('*')">×</div><div class="k sci" onclick="fn('sqrt')">√</div>
+                <div class="k" onclick="num('1')">1</div><div class="k" onclick="num('2')">2</div><div class="k" onclick="num('3')">3</div><div class="k sci" onclick="op('-')">–</div><div class="k sci" onclick="op('PI')">π</div>
+                <div class="k" onclick="num('.')">.</div><div class="k" onclick="num('0')">0</div><div class="k eq" onclick="calc()">=</div><div class="k sci" onclick="op('+')">+</div><div class="k sci" onclick="op('%')">%</div>
+            </div>
+        </section>
 
-## 📱 Android App (AdMob Ready)
-This code is optimized to be wrapped in an Android WebView.
-1.  Copy `index.html` to your Android Studio `assets` folder.
-2.  Use a `WebView` in your layout.
-3.  Add an `AdView` at the bottom for AdMob banners.
+        <!-- Loan -->
+        <section id="loan" class="sec">
+            <div class="inp-grp"><label>Amount (₹)</label><input type="number" id="L_P" value="500000"></div>
+            <div class="inp-grp"><label>Rate (%)</label><input type="number" id="L_R" value="8.5"></div>
+            <div class="inp-grp"><label>Years</label><input type="number" id="L_N" value="5"></div>
+            <button class="calc-btn" onclick="runLoan()">CALCULATE</button>
+            <div class="res-box">
+                <div class="chart" id="chart"><span>EMI</span></div>
+                <h2 id="emi_val" style="color:var(--s)">₹0</h2>
+                <p>Total Interest: <span id="int_val">0</span></p>
+            </div>
+        </section>
 
----
-**Created by:** OM PRAKASH JENA
+        <!-- Contact -->
+        <section id="contact" class="sec">
+            <div style="background:#111;padding:20px;border-radius:10px;text-align:center;border:1px solid #333;">
+                <h3 style="color:#fff">CONTACT SUPPORT</h3>
+                <a href="mailto:ind.dropshipping.hde@gmail.com" style="color:var(--s);text-decoration:none;display:block;margin-top:10px">ind.dropshipping.hde@gmail.com</a>
+            </div>
+            <div style="margin-top:20px">
+                <h4 style="color:var(--g)">REVIEWS</h4>
+                <div style="background:#111;padding:10px;margin-top:10px;border-radius:5px">"Best Calculator!" - Rahul</div>
+                <div style="background:#111;padding:10px;margin-top:10px;border-radius:5px">"Love the hacker theme." - Sarah</div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align:center;padding:10px;font-size:0.8rem;color:#666">Made by OM PRAKASH JENA</footer>
+
+    <script>
+        // Init
+        if(!localStorage.getItem('user')) document.getElementById('modal').classList.add('show');
+        function login(){
+            if(document.getElementById('name').value){
+                localStorage.setItem('user',document.getElementById('name').value);
+                document.getElementById('modal').classList.remove('show');
+            }
+        }
+        function tab(id){
+            document.querySelectorAll('.sec').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.btn').forEach(e=>e.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Calc Logic
+        let eq=""; 
+        const scr=document.getElementById('scr');
+        function num(n){ eq+=n; upd(); }
+        function op(o){ eq+= (o=='PI'?'3.14159':o); upd(); }
+        function fn(f){ eq+= (f=='sqrt'?'Math.sqrt(': 'Math.'+f+'('); upd(); }
+        function del(){ eq=eq.slice(0,-1); upd(); }
+        function clr(){ eq=""; document.getElementById('hist').innerText=""; upd(); }
+        function upd(){ scr.innerText = eq || "0"; }
+        function calc(){
+            try{
+                document.getElementById('hist').innerText = eq + "=";
+                eq = eval(eq.replace(/\^/g,'**').replace(/%/g,'/100'));
+                scr.innerText = eq;
+            }catch{scr.innerText="Error"; eq="";}
+        }
+
+        // Loan Logic
+        function runLoan(){
+            let P=document.getElementById('L_P').value, R=document.getElementById('L_R').value/1200, N=document.getElementById('L_N').value*12;
+            let emi = (P*R*Math.pow(1+R,N))/(Math.pow(1+R,N)-1);
+            let tot = emi*N, int=tot-P;
+            let fmt = new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'});
+            document.getElementById('emi_val').innerText = fmt.format(emi);
+            document.getElementById('int_val').innerText = fmt.format(int);
+            let deg = (int/tot)*360;
+            document.getElementById('chart').style.background = `conic-gradient(#8b5cf6 0deg ${deg}deg, #222 ${deg}deg 360deg)`;
+        }
+    </script>
+</body>
+</html>
